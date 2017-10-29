@@ -1,4 +1,4 @@
-KivyMD
+Custom uix
 ======
 
 This is a copy of the amazing kivymd library made by the kivymd team with some minor changes to suit my specific needs. 
