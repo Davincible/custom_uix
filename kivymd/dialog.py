@@ -8,6 +8,7 @@ from kivy.animation import Animation
 from kivymd.theming import ThemableBehavior
 from kivymd.elevationbehavior import RectangularElevationBehavior
 from kivymd.button import MDFlatButton
+from kivy.clock import Clock
 
 Builder.load_string('''
 <MDDialog>:
@@ -22,17 +23,20 @@ Builder.load_string('''
     _action_area:action_area
     elevation: 12
     GridLayout:
+        
         cols: 1
         GridLayout:
             cols: 1
             padding: dp(24), dp(24), dp(24), dp(24)
             spacing: dp(20)
+            id: base_layout
             MDLabel:
+                id: title_label
                 text: root.title
-                font_style: 'Title'
-                theme_text_color: 'Primary'
-                halign: 'left'
-                valign: 'middle'
+                font_style: root.font_style
+                theme_text_color: root.theme_text_color
+                halign: root.halign
+                valign: root.valign
                 size_hint_y: None
                 text_size: self.width, None
                 height: self.texture_size[1]
@@ -60,6 +64,10 @@ Builder.load_string('''
 
 class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
     title = StringProperty('')
+    theme_text_color = StringProperty('Primary')
+    font_style = StringProperty('Title Bold')
+    halign = StringProperty('left')
+    valign = StringProperty('middle')
 
     content = ObjectProperty(None)
 
@@ -74,6 +82,13 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
         self.bind(_action_buttons=self._update_action_buttons,
                   auto_dismiss=lambda *x: setattr(self.shadow, 'on_release',
                                                   self.shadow.dismiss if self.auto_dismiss else None))
+        Clock.schedule_once(self._set_height)
+
+    def _set_height(self, *args):
+        if self._action_buttons:
+            self.height = self.ids.base_layout.minimum_height + self.ids.container.height + dp(52)
+        else:
+            self.height = self.ids.base_layout.minimum_height + self.ids.container.height
 
     def add_action_button(self, text, action=None):
         """Add an :class:`FlatButton` to the right of the action area.

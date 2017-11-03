@@ -16,7 +16,7 @@ Builder.load_string('''
 
 class MDLabel(ThemableBehavior, Label):
     font_style = OptionProperty(
-        'Body1', options=['Body1', 'Body2', 'Caption', 'Subhead', 'Title',
+        'Body1', options=['Body1', 'Body2', 'Caption', 'Subhead', 'Title', 'Title Bold',
                           'Headline', 'Display1', 'Display2', 'Display3',
                           'Display4', 'Button', 'Icon'])
 
@@ -25,7 +25,8 @@ class MDLabel(ThemableBehavior, Label):
                                  'Body2': ['Roboto', True, 14, 13],
                                  'Caption': ['Roboto', False, 12, None],
                                  'Subhead': ['Roboto', False, 16, 15],
-                                 'Title': ['Roboto', True, 20, None],
+                                 'Title': ['RobotoLight', True, 20, None],
+                                 'Title Bold': ['Roboto', True, 20, None],
                                  'Headline': ['Roboto', False, 24, None],
                                  'Display1': ['Roboto', False, 34, None],
                                  'Display2': ['Roboto', False, 45, None],

@@ -75,7 +75,7 @@ Builder.load_string('''
             radius: (dp(2),)
     content: content
     height: dp(36)
-    width: content.texture_size[0] + dp(32)
+    width: content.texture_size[0] + root.offset if self.auto_width else dp(100)
     padding: (dp(8), 0)
     theme_text_color: 'Primary'
     MDLabel:
@@ -83,13 +83,13 @@ Builder.load_string('''
         text: root._capitalized_text
         font_style: 'Button'
         size_hint_x: None
-        text_size: (None, root.height)
+        text_size: (None, root.height) if root.auto_width else (root.width - root.offset, root.height)
         height: self.texture_size[1]
         theme_text_color: root.theme_text_color
         text_color: root.text_color
         disabled: root.disabled
-        valign: 'middle'
-        halign: 'center'
+        valign: root.valign
+        halign: root.halign
         opposite_colors: root.opposite_colors
 
 <MDRaisedButton>:
@@ -350,9 +350,21 @@ class BaseRectangularButton(RectangularRippleBehavior, BaseButton):
                                    errorhandler=lambda x: dp(88))
     text = StringProperty('')
     _capitalized_text = StringProperty('')
+    capitalize = BooleanProperty(True)
+    auto_width = BooleanProperty(True)
+    valign = StringProperty('middle')
+    halign = StringProperty('center')
+    offset = NumericProperty('32dp')
+
+    def __init__(self, capitalize=True, **kwargs):
+        super(BaseRectangularButton, self).__init__(**kwargs)
+        self.capitalize = capitalize
 
     def on_text(self, instance, value):
-        self._capitalized_text = value.upper()
+        if self.capitalize:
+            self._capitalized_text = value.upper()
+        else:
+            self._capitalized_text = value
 
 
 class MDIconButton(BaseRoundButton, BaseFlatButton, BasePressedButton):

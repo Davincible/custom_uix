@@ -154,6 +154,7 @@ NavigationLayout:
             background_hue: '500'
             left_action_items: [['menu', lambda x: app.root.toggle_nav_drawer()]]
             right_action_items: [['dots-vertical', lambda x: app.root.toggle_nav_drawer()]]
+        
         ScreenManager:
             id: scr_mngr
             Screen:
@@ -974,7 +975,7 @@ class KitchenSink(App):
                                content=content,
                                size_hint=(.8, None),
                                height=dp(200),
-                               auto_dismiss=False)
+                               auto_dismiss=True)
 
         self.dialog.add_action_button("Dismiss",
                                       action=lambda *x: self.dialog.dismiss())
