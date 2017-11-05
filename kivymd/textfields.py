@@ -124,6 +124,7 @@ class MDTextField(ThemableBehavior, FixedHintTextInput):
 
     error = BooleanProperty(False)
     _text_len_error = BooleanProperty(False)
+    ignore_error = False
 
     _hint_lbl_font_size = NumericProperty(sp(16))
     _hint_y = NumericProperty(dp(38))
@@ -203,7 +204,12 @@ class MDTextField(ThemableBehavior, FixedHintTextInput):
         self._right_msg_lbl.width = self.width
         self._hint_lbl.width = self.width
 
-    def on_focus(self, *args):
+    def reset_textbox(self):
+        self.text = ''
+        self.ignore_error = True
+        self.on_focus()
+
+    def on_focus(self,*args):
         Animation.cancel_all(self, '_line_width', '_hint_y',
                              '_hint_lbl_font_size')
         if self.max_text_length is None:
@@ -219,6 +225,11 @@ class MDTextField(ThemableBehavior, FixedHintTextInput):
                 has_error = True
             else:
                 has_error = False
+
+        if self.ignore_error:
+            has_error = False
+            self.has_had_text = False
+            self.ignore_error = False
 
         if self.focus:
             self.has_had_text = True

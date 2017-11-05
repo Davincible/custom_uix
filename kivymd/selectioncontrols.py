@@ -92,6 +92,7 @@ class MDCheckbox(ThemableBehavior, CircularRippleBehavior,
                                        t='out_quad')
         super(MDCheckbox, self).__init__(**kwargs)
         self.register_event_type('on_active')
+        self.register_event_type('on_value')
         self.check_anim_out.bind(
             on_complete=lambda *x: self.check_anim_in.start(self))
 
@@ -115,6 +116,9 @@ class MDCheckbox(ThemableBehavior, CircularRippleBehavior,
 
     def on_active(self, instance, value):
         self.state = 'down' if value else 'normal'
+
+    def on_value(self, instance, value):
+        pass
 
 
 class Thumb(CircularElevationBehavior, CircularRippleBehavior, ButtonBehavior,

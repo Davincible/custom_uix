@@ -355,12 +355,23 @@ class BaseRectangularButton(RectangularRippleBehavior, BaseButton):
     valign = StringProperty('middle')
     halign = StringProperty('center')
     offset = NumericProperty('32dp')
+    original_text = StringProperty('')
 
-    def __init__(self, capitalize=True, **kwargs):
+    def __init__(self, capitalize=None, **kwargs):
         super(BaseRectangularButton, self).__init__(**kwargs)
-        self.capitalize = capitalize
+        if capitalize:
+            self.capitalize = capitalize
+        # self.bind(capitalize=lambda *args: self.on_text(None, self._capitalized_text))
+        self.register_event_type('on_capitalize')
+
+    def on_capitalize(self, instance, value):
+        if self.capitalize:
+            self._capitalized_text = self._capitalized_text.upper()
+        else:
+            self._capitalized_text = self.original_text
 
     def on_text(self, instance, value):
+        self.original_text = value
         if self.capitalize:
             self._capitalized_text = value.upper()
         else:

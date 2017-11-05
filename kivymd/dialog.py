@@ -4,6 +4,7 @@ from kivy.lang import Builder
 from kivy.properties import StringProperty, ObjectProperty, ListProperty
 from kivy.metrics import dp
 from kivy.uix.modalview import ModalView
+from kivy.uix.widget import Widget
 from kivy.animation import Animation
 from kivymd.theming import ThemableBehavior
 from kivymd.elevationbehavior import RectangularElevationBehavior
@@ -47,6 +48,7 @@ Builder.load_string('''
                     height: self.minimum_height
                     id: container
         AnchorLayout:
+            id: anchor_layout
             anchor_x: 'right'
             anchor_y: 'center'
             size_hint: 1, None
@@ -90,7 +92,7 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
         else:
             self.height = self.ids.base_layout.minimum_height + self.ids.container.height
 
-    def add_action_button(self, text, action=None):
+    def add_action_button(self, text='', action=None,white_space=False, white_space_width=dp(88), repeat=1):
         """Add an :class:`FlatButton` to the right of the action area.
 
         :param icon: Unicode character for the icon
@@ -98,13 +100,18 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
         :param action: Function set to trigger when on_release fires
         :type action: function or None
         """
-        button = MDFlatButton(text=text,
-                              size_hint=(None, None),
-                              height=dp(36))
-        if action:
-            button.bind(on_release=action)
-        button.text_color = self.theme_cls.primary_color
-        button.md_bg_color = self.theme_cls.bg_light
+        if not white_space:
+            button = MDFlatButton(text=text,
+                                  size_hint=(None, None),
+                                  height=dp(36))
+            button.text_color = self.theme_cls.primary_color
+            button.md_bg_color = self.theme_cls.bg_light
+            if action:
+                button.bind(on_release=action)
+        else:
+            button = Widget(size_hint=(None, None),
+                            size=(white_space_width*repeat, dp(36)))
+
         self._action_buttons.append(button)
 
     def add_widget(self, widget):
@@ -186,6 +193,9 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
     def _update_action_buttons(self, *args):
         self._action_area.clear_widgets()
         for btn in self._action_buttons:
-            btn.content.texture_update()
-            btn.width = btn.content.texture_size[0] + dp(16)
+            try:
+                btn.content.texture_update()
+                btn.width = btn.content.texture_size[0] + dp(16)
+            except AttributeError:
+                pass
             self._action_area.add_widget(btn)
