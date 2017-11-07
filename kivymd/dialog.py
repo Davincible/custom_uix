@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from kivy.lang import Builder
-from kivy.properties import StringProperty, ObjectProperty, ListProperty
+from kivy.properties import StringProperty, ObjectProperty, ListProperty, NumericProperty
 from kivy.metrics import dp
 from kivy.uix.modalview import ModalView
 from kivy.uix.widget import Widget
+from kivy.uix.gridlayout import GridLayout
 from kivy.animation import Animation
-from kivymd.theming import ThemableBehavior
+from kivymd.theming import ThemableBehavior, ThemeManager
 from kivymd.elevationbehavior import RectangularElevationBehavior
 from kivymd.button import MDFlatButton
 from kivy.clock import Clock
@@ -14,6 +15,7 @@ from kivy.core.window import Window
 from kivy.event import EventDispatcher
 Builder.load_string('''
 <MDDialog>:
+    height: self.height_
     canvas:
         Color:
             rgba: self.theme_cls.bg_light
@@ -27,7 +29,7 @@ Builder.load_string('''
     GridLayout:
         
         cols: 1
-        GridLayout:
+        BaseLayout:
             cols: 1
             padding: dp(24), dp(24), dp(24), dp(24)
             spacing: dp(20)
@@ -64,6 +66,10 @@ Builder.load_string('''
                 spacing: dp(8)
 ''')
 
+class BaseLayout(GridLayout):
+    def __init__(self, **kwargs):
+        super(BaseLayout, self).__init__(**kwargs)
+        Clock.schedule_once(lambda x: self.bind(minimum_height=self.parent.parent.set_height))
 
 class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
     title = StringProperty('')
@@ -71,6 +77,7 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
     font_style = StringProperty('Title Bold')
     halign = StringProperty('left')
     valign = StringProperty('middle')
+    height_ = NumericProperty(1)
 
     content = ObjectProperty(None)
 
@@ -84,20 +91,37 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
         super(MDDialog, self).__init__(**kwargs)
         self.bind(_action_buttons=self._update_action_buttons,
                   auto_dismiss=lambda *x: setattr(self.shadow, 'on_release',
-                                                  self.shadow.dismiss if self.auto_dismiss else None))
-        Clock.schedule_once(self._set_height)
+                                                  self.shadow.dismiss if self.auto_dismiss else None),
+                  size=lambda *args: self.update_pos())
+        Window.bind(size=lambda *args: self.update_pos())
+        Clock.schedule_once(self.set_height)
+
+    def update_pos(self, *args):
+        if self.size_hint_x:
+            width = self.size_hint_x * Window.size[0]
+        else:
+            width = self.width
+
+        if self.size_hint_y:
+            height = self.size_hint_y * Window.size[1]
+        else:
+            height = self.height
+
+        x = (Window.size[0] - width) / 2
+        y = (Window.size[1] - height) / 2
+        self.pos = [x, y]
 
     def set_size(self, *args):
         old = self.size
         self.size = old
 
-    def _set_height(self, *args):
+    def set_height(self, *args):
         if self._action_buttons:
             new_height = self.ids.base_layout.minimum_height + self.ids.container.height + dp(52)
         else:
             new_height = self.ids.base_layout.minimum_height + self.ids.container.height
-        self.height = new_height if new_height < .8 * Window.size[1] else Window.size[1] * .8
-        Clock.schedule_once(self.set_size)
+        value = new_height if new_height < .8 * Window.size[1] else Window.size[1] * .8
+        self.height_ = value
 
     def add_action_button(self, text='', action=None,white_space=False, white_space_width=dp(88), repeat=1):
         """Add an :class:`FlatButton` to the right of the action area.
@@ -152,6 +176,7 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
         a = Animation(_anim_alpha=1., d=self._anim_duration)
         a.bind(on_complete=lambda *x: self.dispatch('on_open'))
         a.start(self)
+        # print("[ IN THE OPEN FUNCTION ]:", self._window.pos)
         return self
 
     def dismiss(self, *largs, **kwargs):
