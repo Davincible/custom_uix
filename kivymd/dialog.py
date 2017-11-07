@@ -10,7 +10,8 @@ from kivymd.theming import ThemableBehavior
 from kivymd.elevationbehavior import RectangularElevationBehavior
 from kivymd.button import MDFlatButton
 from kivy.clock import Clock
-
+from kivy.core.window import Window
+from kivy.event import EventDispatcher
 Builder.load_string('''
 <MDDialog>:
     canvas:
@@ -88,9 +89,10 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
 
     def _set_height(self, *args):
         if self._action_buttons:
-            self.height = self.ids.base_layout.minimum_height + self.ids.container.height + dp(52)
+            new_height = self.ids.base_layout.minimum_height + self.ids.container.height + dp(52)
         else:
-            self.height = self.ids.base_layout.minimum_height + self.ids.container.height
+            new_height = self.ids.base_layout.minimum_height + self.ids.container.height
+        self.height = new_height if new_height < .8 * Window.size[1] else Window.size[1] * .8
 
     def add_action_button(self, text='', action=None,white_space=False, white_space_width=dp(88), repeat=1):
         """Add an :class:`FlatButton` to the right of the action area.
