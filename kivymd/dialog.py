@@ -87,12 +87,17 @@ class MDDialog(ThemableBehavior, RectangularElevationBehavior, ModalView):
                                                   self.shadow.dismiss if self.auto_dismiss else None))
         Clock.schedule_once(self._set_height)
 
+    def set_size(self, *args):
+        old = self.size
+        self.size = old
+
     def _set_height(self, *args):
         if self._action_buttons:
             new_height = self.ids.base_layout.minimum_height + self.ids.container.height + dp(52)
         else:
             new_height = self.ids.base_layout.minimum_height + self.ids.container.height
         self.height = new_height if new_height < .8 * Window.size[1] else Window.size[1] * .8
+        Clock.schedule_once(self.set_size)
 
     def add_action_button(self, text='', action=None,white_space=False, white_space_width=dp(88), repeat=1):
         """Add an :class:`FlatButton` to the right of the action area.
