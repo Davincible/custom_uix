@@ -7,6 +7,7 @@ from kivy.metrics import sp
 from kivy.properties import NumericProperty, StringProperty, BooleanProperty
 from kivy.properties import OptionProperty, ListProperty
 from kivy.uix.textinput import TextInput
+from kivy.clock import Clock
 from kivymd.label import MDLabel
 from kivymd.theming import ThemableBehavior
 
@@ -208,6 +209,20 @@ class MDTextField(ThemableBehavior, FixedHintTextInput):
         self.text = ''
         self.ignore_error = True
         self.on_focus()
+
+    def show_error(self, msg=None):
+        if msg:
+            old_msg = self.helper_text
+            old_msg_mode = self.helper_text_mode if self.helper_text_mode else ""
+            self.helper_text = msg
+            self.helper_text_mode = 'on_error'
+            Clock.schedule_once(lambda dt: self.restore_helper_text(old_msg, old_msg_mode))
+        self.error = True
+        self.focus = True
+
+    def restore_helper_text(self, msg, mode):
+        # self.helper_text = msg
+        self.helper_text_mode = mode
 
     def on_focus(self,*args):
         Animation.cancel_all(self, '_line_width', '_hint_y',

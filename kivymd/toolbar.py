@@ -3,7 +3,7 @@ from kivy.clock import Clock
 from kivy.factory import Factory
 from kivy.lang import Builder
 from kivy.metrics import dp
-from kivy.properties import ListProperty, StringProperty, OptionProperty, ReferenceListProperty, NumericProperty
+from kivy.properties import ListProperty, StringProperty, OptionProperty, ReferenceListProperty, NumericProperty, BooleanProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.backgroundcolorbehavior import SpecificBackgroundColorBehavior
 from kivymd.button import MDIconButton
@@ -56,7 +56,7 @@ kv_file = '''
             opposite_colors: root.opposite_colors
             theme_text_color: 'Custom'
             text_color: root.specific_text_color
-            text: root.title if not self.texture else ''
+            text: root.title if not root.texture_set else ''
             shorten: True
             shorten_from: 'right'
             
@@ -122,8 +122,12 @@ class Toolbar(ThemableBehavior, RectangularElevationBehavior,
 
     md_bg_color = ListProperty([0, 0, 0, 1])
 
+    texture_set = BooleanProperty(False)
+
     def _update_texture(self, *args):
-        self.ids.logo_content.texture = Image(source=self.logo).texture
+        if self.logo:
+            self.ids.logo_content.texture = Image(source=self.logo).texture
+            self.texture_set = True
 
     def __init__(self, **kwargs):
         super(Toolbar, self).__init__(**kwargs)
