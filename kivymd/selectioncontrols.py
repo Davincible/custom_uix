@@ -14,7 +14,7 @@ from kivymd.icon_definitions import md_icons
 from kivymd.theming import ThemableBehavior
 from kivymd.elevationbehavior import CircularElevationBehavior
 from kivymd.ripplebehavior import CircularRippleBehavior
-from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.behaviors import ButtonBehavior, FocusBehavior
 from kivy.uix.widget import Widget
 
 Builder.load_string('''
@@ -22,12 +22,18 @@ Builder.load_string('''
     canvas:
         Clear
         Color:
-            rgba:         self.color
+            rgba: self.color
         Rectangle:
-            texture:    self.texture
-            size:        self.texture_size
-            pos:        int(self.center_x - self.texture_size[0] / 2.), int(self.center_y - self.texture_size[1] / 2.)
-
+            texture: self.texture
+            size: self.texture_size
+            pos: int(self.center_x - self.texture_size[0] / 2.), int(self.center_y - self.texture_size[1] / 2.)
+        
+        Color:
+            rgba: self.focus_color
+        Line:
+            width: dp(1)
+            points: [self.x, self.y, self.right, self.y, self.right, self.top, self.x, self.top]
+        
     text:             self._radio_icon if self.group else self._checkbox_icon
     font_name:        'Icons'
     font_size:        sp(24)
@@ -77,7 +83,7 @@ Builder.load_string('''
 
 
 class MDCheckbox(ThemableBehavior, CircularRippleBehavior,
-                 ToggleButtonBehavior, Label):
+                 ToggleButtonBehavior, Label, FocusBehavior):
     active = BooleanProperty(False)
 
     _checkbox_icon = StringProperty(
@@ -85,6 +91,7 @@ class MDCheckbox(ThemableBehavior, CircularRippleBehavior,
     _radio_icon = StringProperty(u"{}".format(
         md_icons['checkbox-blank-circle-outline']))
     _icon_active = StringProperty(u"{}".format(md_icons['checkbox-marked']))
+    focus_color = ListProperty([0, 0, 0, 0])
 
     def __init__(self, **kwargs):
         self.check_anim_out = Animation(font_size=0, duration=.1, t='out_quad')
@@ -95,6 +102,14 @@ class MDCheckbox(ThemableBehavior, CircularRippleBehavior,
         self.register_event_type('on_value')
         self.check_anim_out.bind(
             on_complete=lambda *x: self.check_anim_in.start(self))
+
+    def on_focus(self, instance, value, *largs):
+        if value:
+            self.focus_color = (1, 0, 0, .8)
+        else:
+            self.focus_color = (0, 0, 0, 0)
+
+        print("focus called, color now:", self.focus_color)
 
     def on_state(self, *args):
         if self.state == 'down':
@@ -136,7 +151,7 @@ class Thumb(CircularElevationBehavior, CircularRippleBehavior, ButtonBehavior,
             self.center_y - (self.height * self.ripple_scale) / 2)
 
 
-class MDSwitch(ThemableBehavior, ButtonBehavior, FloatLayout):
+class MDSwitch(ThemableBehavior, ButtonBehavior, FloatLayout, FocusBehavior):
     active = BooleanProperty(False)
 
     _thumb_color = ListProperty(get_color_from_hex(colors['Grey']['50']))

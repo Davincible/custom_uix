@@ -2,6 +2,7 @@
 from kivy.lang import Builder
 from kivy.metrics import sp
 from kivy.properties import OptionProperty, DictProperty, ListProperty
+from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.label import Label
 from kivymd.material_resources import DEVICE_TYPE
 from kivymd.theming import ThemableBehavior
@@ -14,7 +15,7 @@ Builder.load_string('''
 ''')
 
 
-class MDLabel(ThemableBehavior, Label):
+class MDLabel(ThemableBehavior, Label, FocusBehavior):
     font_style = OptionProperty(
         'Body1', options=['Body1', 'Body2', 'Caption', 'Subhead', 'Title', 'Title Bold',
                           'Headline', 'Display1', 'Display2', 'Display3',

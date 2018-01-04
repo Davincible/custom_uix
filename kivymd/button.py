@@ -17,7 +17,7 @@ from kivy.properties import StringProperty, BoundedNumericProperty, \
     ListProperty, AliasProperty, BooleanProperty, NumericProperty, \
     OptionProperty, ReferenceListProperty
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.behaviors import ButtonBehavior, FocusBehavior
 from kivy.uix.boxlayout import BoxLayout
 from kivy.animation import Animation
 from kivymd.backgroundcolorbehavior import SpecificBackgroundColorBehavior
@@ -382,12 +382,12 @@ class MDIconButton(BaseRoundButton, BaseFlatButton, BasePressedButton):
     icon = StringProperty('checkbox-blank-circle')
 
 
-class MDFlatButton(BaseRectangularButton, BaseFlatButton, BasePressedButton):
+class MDFlatButton(BaseRectangularButton, BaseFlatButton, BasePressedButton, FocusBehavior):
     pass
 
 
 class MDRaisedButton(BaseRectangularButton, RectangularElevationBehavior,
-                     BaseRaisedButton, BasePressedButton):
+                     BaseRaisedButton, BasePressedButton, FocusBehavior):
     pass
 
 
