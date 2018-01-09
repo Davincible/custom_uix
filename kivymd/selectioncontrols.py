@@ -33,6 +33,7 @@ Builder.load_string('''
         Line:
             width: dp(1)
             points: [self.x, self.y, self.right, self.y, self.right, self.top, self.x, self.top]
+            close: True
         
     text:             self._radio_icon if self.group else self._checkbox_icon
     font_name:        'Icons'
