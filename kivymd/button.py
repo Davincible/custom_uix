@@ -346,8 +346,8 @@ class BaseRectangularButton(RectangularRippleBehavior, BaseButton):
     appropriate on-touch behavior. Also maintains the correct minimum width
     as stated in guidelines.
     '''
-    width = BoundedNumericProperty(dp(88), min=dp(88), max=None,
-                                   errorhandler=lambda x: dp(88))
+    # width = BoundedNumericProperty(dp(88), min=dp(88), max=None,
+    #                                errorhandler=lambda x: dp(88))
     text = StringProperty('')
     _capitalized_text = StringProperty('')
     capitalize = BooleanProperty(True)
