@@ -5,6 +5,7 @@ from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty, ListProperty, BooleanProperty
 from kivy.animation import Animation
 from kivymd.theming import ThemableBehavior
+import threading
 
 Builder.load_string('''
 <MDSpinner>:
@@ -26,6 +27,11 @@ Builder.load_string('''
         PopMatrix
 
 ''')
+
+def threaded(fn):
+    def wrapper(*args, **kwargs):
+        threading.Thread(target=fn, args=args, kwargs=kwargs).start()
+    return wrapper
 
 
 class MDSpinner(ThemableBehavior, Widget):
@@ -82,6 +88,7 @@ class MDSpinner(ThemableBehavior, Widget):
     def _update_color(self, *args):
         self.color = self.theme_cls.primary_color
 
+    @threaded
     def _start_determinate(self, *args):
         self._alpha_anim_in.start(self)
 
