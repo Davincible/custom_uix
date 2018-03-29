@@ -105,6 +105,7 @@ class MDSpinner(ThemableBehavior, Widget):
 
         _angle_start_anim.start(self)
 
+    # @threaded
     def _start_loop(self, *args):
         if self._alpha == 0:
             _rot_anim = Animation(_rotation_angle=0,
@@ -128,6 +129,7 @@ class MDSpinner(ThemableBehavior, Widget):
 
         _angle_back_anim.start(self)
 
+    @threaded
     def on__rotation_angle(self, *args):
         if self._rotation_angle == 0:
             self._rotation_angle = 360
