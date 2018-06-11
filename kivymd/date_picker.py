@@ -127,7 +127,7 @@ Builder.load_string("""
     MDLabel:
         font_style: 'Caption'
         theme_text_color: 'Custom' if root.is_today and not root.is_selected else 'Primary'
-        text_color: root.theme_cls.primary_color
+        text_color: root.today_color
         opposite_colors: root.is_selected if root.owner.sel_month == root.owner.month \
             and root.owner.sel_year == root.owner.year and str(self.text) == str(root.owner.sel_day) else False
         size_hint_x: None
@@ -151,7 +151,8 @@ Builder.load_string("""
     size_hint: (None, None)
     canvas:
         Color:
-            rgba: self.theme_cls.primary_color if self.shown else [0, 0, 0, 0]
+            #rgba: self.theme_cls.primary_color if self.shown else [0, 0, 0, 0]
+            rgba: self.display_color if self.shown else [0, 0, 0, 0]
         Ellipse:
             size: (dp(40), dp(40)) if root.theme_cls.device_orientation == 'portrait'\
                 else (dp(32), dp(32))
@@ -162,12 +163,14 @@ Builder.load_string("""
 
 class DaySelector(ThemableBehavior, AnchorLayout):
     shown = BooleanProperty(False)
+    display_color = None
 
     def __init__(self, parent):
         super(DaySelector, self).__init__()
         self.parent_class = parent
         self.parent_class.add_widget(self, index=7)
         self.selected_widget = None
+        self.display_color = self.theme_cls.primary_color
         Window.bind(on_resize=self.move_resize)
 
     def update(self):
@@ -195,6 +198,14 @@ class DayButton(ThemableBehavior, CircularRippleBehavior, ButtonBehavior,
     owner = ObjectProperty()
     is_today = BooleanProperty(False)
     is_selected = BooleanProperty(False)
+    today_color = ListProperty([])
+
+    def __init__(self, today_color=None, **kwargs):
+        super(DayButton, self).__init__(**kwargs)
+        if today_color:
+            self.today_color = today_color
+        else:
+            self.today_color = self.theme_cls.primary_color
 
     def on_release(self):
         self.owner.set_selected_widget(self)
@@ -217,14 +228,16 @@ class MDDatePicker(FloatLayout, ThemableBehavior, RectangularElevationBehavior,
     year = NumericProperty()
     today = date.today()
     callback = ObjectProperty()
+    selector_color = ListProperty([])
     background_color = ListProperty([0, 0, 0, 0.7])
 
     class SetDateError(Exception):
         pass
 
     def __init__(self, callback, year=None, month=None, day=None,
-                 firstweekday=0,
+                 firstweekday=0, selector_color=None,
                  **kwargs):
+        self.register_event_type('on_selector_color')
         self.callback = callback
         self.cal = calendar.Calendar(firstweekday)
         self.sel_year = year if year else self.today.year
@@ -235,10 +248,15 @@ class MDDatePicker(FloatLayout, ThemableBehavior, RectangularElevationBehavior,
         self.day = self.sel_day
         super(MDDatePicker, self).__init__(**kwargs)
         self.selector = DaySelector(parent=self)
-        self.generate_cal_widgets()
+        if selector_color:
+            self.selector_color = selector_color
+        self.generate_cal_widgets(selector_color)
         self.update_cal_matrix(self.sel_year, self.sel_month)
         self.set_month_day(self.sel_day)
         self.selector.update()
+
+    def on_selector_color(self, *args):
+        self.selector.display_color = self.selector_color
 
     def ok_click(self):
         self.callback(date(self.sel_year, self.sel_month, self.sel_day))
@@ -313,12 +331,12 @@ class MDDatePicker(FloatLayout, ThemableBehavior, RectangularElevationBehavior,
                     self.cal_list[idx].is_today = dates[idx] == self.today
             self.selector.update()
 
-    def generate_cal_widgets(self):
+    def generate_cal_widgets(self, today_color=None):
         cal_list = []
         for i in calendar.day_abbr:
             self.cal_layout.add_widget(WeekdayLabel(text=i[0].upper()))
         for i in range(6 * 7):  # 6 weeks, 7 days a week
-            db = DayButton(owner=self)
+            db = DayButton(owner=self, today_color=today_color)
             cal_list.append(db)
             self.cal_layout.add_widget(db)
         self.cal_list = cal_list

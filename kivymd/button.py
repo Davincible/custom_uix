@@ -377,6 +377,9 @@ class BaseRectangularButton(RectangularRippleBehavior, BaseButton):
         else:
             self._capitalized_text = value
 
+    def get_optimal_width(self):
+        return self.ids.content.texture_size[0] + self.offset
+
 
 class MDIconButton(BaseRoundButton, BaseFlatButton, BasePressedButton):
     icon = StringProperty('checkbox-blank-circle')

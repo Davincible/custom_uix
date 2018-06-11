@@ -18,7 +18,7 @@ Builder.load_string('''
         Color:
             rgba: self.line_color_normal
         Line:
-            points: self.x, self.y + dp(16), self.x + self.width, self.y + dp(16)
+            points: self.x, self.y + self.offset, self.x + self.width, self.y + self.offset
             width: 1
             dash_length: dp(3)
             dash_offset: 2 if self.disabled else 0
@@ -26,7 +26,7 @@ Builder.load_string('''
             rgba: self._current_line_color
         Rectangle:
             size: self._line_width, dp(2)
-            pos: self.center_x - (self._line_width / 2), self.y + dp(16)
+            pos: self.center_x - (self._line_width / 2), self.y + self.offset
         Color:
             rgba: self._current_error_color
         Rectangle:
@@ -38,7 +38,7 @@ Builder.load_string('''
         Rectangle:
             texture: self._right_msg_lbl.texture
             size: self._right_msg_lbl.texture_size
-            pos: self.width-self._right_msg_lbl.texture_size[0]+dp(45), self.y
+            pos: self.width-self._right_msg_lbl.texture_size[0] + dp(45), self.y
         Color:
             rgba: (self._current_line_color if self.focus and not self.cursor_blink else (0, 0, 0, 0))
         Rectangle:
@@ -61,7 +61,7 @@ Builder.load_string('''
     padding: 0, dp(16), 0, dp(10)
     multiline: False
     size_hint_y: None
-    height: self.minimum_height + dp(8)
+    height: self.minimum_height + (self.offset/2)
 
 <TextfieldLabel>
     disabled_color: self.theme_cls.disabled_hint_text_color
@@ -135,6 +135,9 @@ class MDTextField(ThemableBehavior, FixedHintTextInput):
     _current_hint_text_color = ListProperty([0.0, 0.0, 0.0, 0.0])
     _current_right_lbl_color = ListProperty([0.0, 0.0, 0.0, 0.0])
 
+    offset = NumericProperty(dp(16))
+    use_offset = BooleanProperty(True)
+
     def __init__(self, **kwargs):
         self._msg_lbl = TextfieldLabel(font_style='Caption',
                                        halign='left',
@@ -173,6 +176,14 @@ class MDTextField(ThemableBehavior, FixedHintTextInput):
                             theme_style=self._update_theme_style,
                             accent_color=self._update_accent_color)
         self.has_had_text = False
+
+        self.register_event_type('on_use_offset')
+
+    def on_use_offset(self, *args):
+        if self.use_offset:
+            self.offset = dp(16)
+        else:
+            self.offset = dp(6)
 
     def _update_colors(self, color):
         self.line_color_focus = color
