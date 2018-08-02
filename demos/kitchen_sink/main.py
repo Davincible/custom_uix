@@ -973,7 +973,7 @@ class KitchenSink(App):
         content.bind(texture_size=content.setter('size'))
         self.dialog = MDDialog(title="This is a test dialog",
                                content=content,
-                               size_hint=(.8, None),
+                               sizz_hint=(.8, None),
                                height=dp(200),
                                auto_dismiss=True)
 
