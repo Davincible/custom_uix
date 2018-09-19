@@ -44,8 +44,8 @@ Builder.load_string("""
                     size: (self.width,dp(2))
     ScreenManager:
         id: tab_manager
-        on_current: root.dispatch('on_current', args[1])
-        current: root.current
+        on_current: setattr(root, "current", args[1]); root.dispatch("on_current")
+        # current: root.current
         screens: root.tabs
         transition: sm.SlideTransition()
             
@@ -360,7 +360,7 @@ class MDTabbedPanel(TabbedPanelBase):
     # Tab bar bottom border color (leave empty for theme color)
     tab_border_color = ListProperty([])
 
-    current_ = ''
+    current_ = StringProperty()
 
     def __init__(self, **kwargs):
         super(MDTabbedPanel, self).__init__(**kwargs)
@@ -369,10 +369,7 @@ class MDTabbedPanel(TabbedPanelBase):
         self.register_event_type('on_current')
 
     def on_current(self, *args):
-        try:
-            self.current_ = args[0]
-        except IndexError:
-            pass
+        pass
 
     def on_tab_width_mode(self, *args):
         self._refresh_tabs()
